@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 
 import { openMeteoWeatherProvider } from '@/features/weather/api/open-meteo-client';
 import type { CurrentWeather } from '@/features/weather/model/current-weather';
+import type { LocationWeather } from '@/features/weather/model/location-weather';
 import { persistStormPhoto } from '@/services/files/photo-store';
 import { getCurrentCoordinates } from '@/services/location/get-current-coordinates';
 import type { GeoPoint } from '@/services/location/types';
@@ -51,14 +52,16 @@ export function useCaptureObservation() {
 
       const latitude = roundCoord(location.latitude);
       const longitude = roundCoord(location.longitude);
-      const cached = queryClient.getQueryData<CurrentWeather>([
+      const cached = queryClient.getQueryData<LocationWeather>([
         'weather',
-        'current',
+        'location',
         latitude,
         longitude,
       ]);
 
-      let weather: WeatherSnapshot | null = cached ? toWeatherSnapshot(cached) : null;
+      let weather: WeatherSnapshot | null = cached?.current
+        ? toWeatherSnapshot(cached.current)
+        : null;
 
       if (!weather) {
         try {

@@ -6,6 +6,8 @@ import { isAppError } from '@/shared/lib/errors';
 
 import { openMeteoWeatherProvider } from '../api/open-meteo-client';
 import type { CurrentWeather } from '../model/current-weather';
+import type { DailyForecastDay } from '../model/daily-forecast';
+import type { HourlyForecastHour } from '../model/hourly-forecast';
 
 const LOCATION_STALE_MS = 5 * 60 * 1000;
 const WEATHER_STALE_MS = 3 * 60 * 1000;
@@ -23,6 +25,8 @@ function shouldRetry(failureCount: number, error: unknown): boolean {
 
 export type CurrentWeatherState = {
   weather: CurrentWeather | undefined;
+  hourly: HourlyForecastHour[] | undefined;
+  daily: DailyForecastDay[] | undefined;
   location: GeoPoint | undefined;
   isLoading: boolean;
   isFetching: boolean;
@@ -43,9 +47,9 @@ export function useCurrentWeather(): CurrentWeatherState {
   const longitude = locationQuery.data ? roundCoord(locationQuery.data.longitude) : null;
 
   const weatherQuery = useQuery({
-    queryKey: ['weather', 'current', latitude, longitude],
+    queryKey: ['weather', 'location', latitude, longitude],
     queryFn: () =>
-      openMeteoWeatherProvider.getCurrentWeather(
+      openMeteoWeatherProvider.getLocationWeather(
         locationQuery.data!.latitude,
         locationQuery.data!.longitude
       ),
@@ -66,7 +70,9 @@ export function useCurrentWeather(): CurrentWeatherState {
     (locationQuery.isSuccess && weatherQuery.isLoading && !weatherQuery.data);
 
   return {
-    weather: weatherQuery.data,
+    weather: weatherQuery.data?.current,
+    hourly: weatherQuery.data?.hourly,
+    daily: weatherQuery.data?.daily,
     location: locationQuery.data,
     isLoading,
     isFetching: locationQuery.isFetching || weatherQuery.isFetching,

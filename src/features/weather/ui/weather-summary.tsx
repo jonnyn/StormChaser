@@ -10,6 +10,7 @@ import { useUnits } from '@/shared/units/units-context';
 
 import type { CurrentWeather } from '../model/current-weather';
 import { weatherCodeLabel } from '../model/weather-code-label';
+import { WeatherGlyph } from './weather-glyph';
 
 type WeatherSummaryProps = {
   weather: CurrentWeather;
@@ -25,14 +26,17 @@ export function WeatherSummary({ weather, location }: WeatherSummaryProps) {
   const { units, toggleUnits } = useUnits();
 
   const temperature = formatTemperature(weather.temperatureC, units);
+  const feelsLike = formatTemperature(weather.apparentTemperatureC, units);
   const wind = formatWindSpeed(weather.windSpeedKmh, units);
   const precipitation = formatPrecipitation(weather.precipitationMm, units);
+  const chance = `${Math.round(weather.precipitationProbability)}%`;
+  const condition = weatherCodeLabel(weather.weatherCode);
 
   return (
     <View style={styles.stack}>
       <View style={styles.headerRow}>
         <ThemedText type="small" themeColor="textSecondary">
-          {weatherCodeLabel(weather.weatherCode)}
+          Now
         </ThemedText>
         <Pressable
           accessibilityRole="button"
@@ -54,12 +58,25 @@ export function WeatherSummary({ weather, location }: WeatherSummaryProps) {
 
       <View
         accessibilityRole="summary"
-        accessibilityLabel={`Temperature ${temperature}, wind ${wind}, precipitation ${precipitation}`}
-        style={[styles.card, { backgroundColor: theme.backgroundElement }]}
+        accessibilityLabel={`Temperature ${temperature}, feels like ${feelsLike}, ${condition}, wind ${wind}, precipitation ${precipitation}, ${chance} chance of precipitation`}
+        style={[styles.hero, { backgroundColor: theme.backgroundElement }]}
       >
-        <Metric label="Temperature" value={temperature} />
-        <Metric label="Wind" value={wind} />
-        <Metric label="Precipitation" value={precipitation} />
+        <View style={styles.heroMain}>
+          <WeatherGlyph code={weather.weatherCode} size={44} />
+          <View style={styles.heroCopy}>
+            <ThemedText style={styles.heroTemp}>{temperature}</ThemedText>
+            <ThemedText type="smallBold">{condition}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              Feels like {feelsLike}
+            </ThemedText>
+          </View>
+        </View>
+
+        <View style={styles.metrics}>
+          <Metric label="Wind" value={wind} />
+          <Metric label="Precip" value={precipitation} />
+          <Metric label="Chance" value={chance} />
+        </View>
       </View>
 
       <ThemedText type="small" themeColor="textSecondary">
@@ -81,7 +98,7 @@ function Metric({ label, value }: { label: string; value: string }) {
       <ThemedText type="small" themeColor="textSecondary">
         {label}
       </ThemedText>
-      <ThemedText type="subtitle">{value}</ThemedText>
+      <ThemedText type="smallBold">{value}</ThemedText>
     </View>
   );
 }
@@ -113,12 +130,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.two,
     paddingVertical: Spacing.one,
   },
-  card: {
+  hero: {
     borderRadius: Spacing.three,
     padding: Spacing.four,
     gap: Spacing.four,
   },
+  heroMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.three,
+  },
+  heroCopy: {
+    flex: 1,
+    gap: Spacing.one,
+  },
+  heroTemp: {
+    fontSize: 40,
+    lineHeight: 44,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+  },
+  metrics: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
   metric: {
+    flex: 1,
     gap: Spacing.one,
   },
   loading: {

@@ -4,6 +4,8 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet } from 'react-native'
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useCurrentWeather } from '@/features/weather/hooks/use-current-weather';
+import { HourlyForecast } from '@/features/weather/ui/hourly-forecast';
+import { WeatherForecast } from '@/features/weather/ui/weather-forecast';
 import { WeatherNotFound } from '@/features/weather/ui/weather-not-found';
 import { WeatherLoading, WeatherSummary } from '@/features/weather/ui/weather-summary';
 import { useTheme } from '@/hooks/use-theme';
@@ -12,8 +14,17 @@ import { Screen } from '@/shared/ui/screen';
 export default function ConditionsScreen() {
   const router = useRouter();
   const theme = useTheme();
-  const { weather, location, isLoading, isFetching, errorMessage, canRetry, refetch } =
-    useCurrentWeather();
+  const {
+    weather,
+    hourly,
+    daily,
+    location,
+    isLoading,
+    isFetching,
+    errorMessage,
+    canRetry,
+    refetch,
+  } = useCurrentWeather();
   const canLog = !isLoading && !errorMessage && Boolean(weather && location);
   const isPullRefreshing = isFetching && !isLoading;
 
@@ -40,21 +51,24 @@ export default function ConditionsScreen() {
         ) : null}
 
         {!isLoading && !errorMessage && weather && location ? (
-          <WeatherSummary weather={weather} location={location} />
-        ) : null}
-
-        {canLog ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Log this weather as a storm observation"
-            onPress={() => router.push('/capture')}
-            style={({ pressed }) => [
-              styles.logButton,
-              { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
-            ]}
-          >
-            <ThemedText style={styles.logButtonLabel}>Log this</ThemedText>
-          </Pressable>
+          <>
+            <WeatherSummary weather={weather} location={location} />
+            {canLog ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Log this weather as a storm observation"
+                onPress={() => router.push('/capture')}
+                style={({ pressed }) => [
+                  styles.logButton,
+                  { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
+                ]}
+              >
+                <ThemedText style={styles.logButtonLabel}>Log this</ThemedText>
+              </Pressable>
+            ) : null}
+            {hourly && hourly.length > 0 ? <HourlyForecast hours={hourly} /> : null}
+            {daily && daily.length > 0 ? <WeatherForecast days={daily} /> : null}
+          </>
         ) : null}
       </ScrollView>
     </Screen>
@@ -68,6 +82,7 @@ const styles = StyleSheet.create({
   content: {
     gap: Spacing.three,
     flexGrow: 1,
+    paddingBottom: Spacing.six,
   },
   logButton: {
     alignSelf: 'flex-start',

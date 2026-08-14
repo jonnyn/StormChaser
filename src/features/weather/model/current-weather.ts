@@ -1,11 +1,9 @@
 export type CurrentWeather = {
   temperatureC: number;
+  apparentTemperatureC: number;
   windSpeedKmh: number;
   precipitationMm: number;
+  precipitationProbability: number;
   weatherCode: number;
   observedAt: string;
-};
-
-export type WeatherProvider = {
-  getCurrentWeather: (latitude: number, longitude: number) => Promise<CurrentWeather>;
 };
