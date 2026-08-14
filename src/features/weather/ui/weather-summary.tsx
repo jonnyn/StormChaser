@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -6,6 +6,7 @@ import { useTheme } from '@/hooks/use-theme';
 import type { GeoPoint } from '@/services/location/types';
 import { formatDateTime } from '@/shared/lib/dates';
 import { formatPrecipitation, formatTemperature, formatWindSpeed } from '@/shared/lib/units';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { useUnits } from '@/shared/units/units-context';
 
 import type { CurrentWeather } from '../model/current-weather';
@@ -107,9 +108,55 @@ export function WeatherLoading() {
   const theme = useTheme();
 
   return (
-    <View style={styles.loading}>
-      <ActivityIndicator color={theme.accent} />
-      <ThemedText themeColor="textSecondary">Fetching conditions…</ThemedText>
+    <View
+      accessibilityLabel="Loading conditions"
+      accessibilityRole="progressbar"
+      accessible
+      style={styles.loading}
+    >
+      <View style={styles.headerRow}>
+        <Skeleton width={48} height={12} />
+        <Skeleton width={72} height={28} borderRadius={Spacing.two} />
+      </View>
+
+      <View style={[styles.hero, { backgroundColor: theme.backgroundElement }]}>
+        <View style={styles.heroMain}>
+          <Skeleton width={52} height={52} borderRadius={26} />
+          <View style={styles.heroCopy}>
+            <Skeleton width={110} height={36} borderRadius={10} />
+            <Skeleton width="70%" height={14} />
+            <Skeleton width="55%" height={12} />
+          </View>
+        </View>
+        <View style={styles.metrics}>
+          <Skeleton height={40} borderRadius={Spacing.two} style={styles.metric} />
+          <Skeleton height={40} borderRadius={Spacing.two} style={styles.metric} />
+          <Skeleton height={40} borderRadius={Spacing.two} style={styles.metric} />
+        </View>
+      </View>
+
+      <View style={styles.hourlySkeleton}>
+        <Skeleton width={120} height={14} />
+        <View style={styles.hourlyRow}>
+          {Array.from({ length: 4 }, (_, index) => (
+            <Skeleton key={index} width={76} height={110} borderRadius={Spacing.three} />
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.dailySkeleton}>
+        <Skeleton width={110} height={14} />
+        <View style={[styles.dailyCard, { backgroundColor: theme.backgroundElement }]}>
+          {Array.from({ length: 3 }, (_, index) => (
+            <View key={index} style={styles.dailyRow}>
+              <Skeleton width={40} height={14} />
+              <Skeleton width={22} height={22} borderRadius={11} />
+              <Skeleton height={14} style={{ flex: 1 }} />
+              <Skeleton width={40} height={14} />
+            </View>
+          ))}
+        </View>
+      </View>
     </View>
   );
 }
@@ -160,7 +207,25 @@ const styles = StyleSheet.create({
   },
   loading: {
     gap: Spacing.three,
-    alignItems: 'flex-start',
-    paddingTop: Spacing.two,
+  },
+  hourlySkeleton: {
+    gap: Spacing.two,
+  },
+  hourlyRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
+  dailySkeleton: {
+    gap: Spacing.two,
+  },
+  dailyCard: {
+    borderRadius: Spacing.three,
+    padding: Spacing.three,
+    gap: Spacing.three,
+  },
+  dailyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
   },
 });

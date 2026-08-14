@@ -1,16 +1,9 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 import type { StormObservation } from '../model/storm-observation';
 import { ObservationListEmpty } from './observation-list-empty';
@@ -47,9 +40,26 @@ export function ObservationList({
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator color={theme.accent} />
-        <ThemedText themeColor="textSecondary">Loading field log…</ThemedText>
+      <View
+        accessibilityLabel="Loading field log"
+        accessibilityRole="progressbar"
+        accessible
+        style={styles.loading}
+      >
+        <Skeleton width={140} height={36} borderRadius={Spacing.two} />
+        {Array.from({ length: 4 }, (_, index) => (
+          <View
+            key={index}
+            style={[styles.rowSkeleton, { backgroundColor: theme.backgroundElement }]}
+          >
+            <Skeleton width={72} height={72} borderRadius={Spacing.two} />
+            <View style={styles.rowMeta}>
+              <Skeleton width="55%" height={14} />
+              <Skeleton width="70%" height={12} />
+              <Skeleton width="45%" height={12} />
+            </View>
+          </View>
+        ))}
       </View>
     );
   }
@@ -96,9 +106,20 @@ export function ObservationList({
 }
 
 const styles = StyleSheet.create({
-  centered: {
+  loading: {
     gap: Spacing.three,
     paddingTop: Spacing.two,
+  },
+  rowSkeleton: {
+    flexDirection: 'row',
+    gap: Spacing.three,
+    padding: Spacing.two,
+    borderRadius: Spacing.three,
+    alignItems: 'center',
+  },
+  rowMeta: {
+    flex: 1,
+    gap: Spacing.two,
   },
   flexGrow: {
     flexGrow: 1,
