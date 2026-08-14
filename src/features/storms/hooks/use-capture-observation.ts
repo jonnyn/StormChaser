@@ -22,9 +22,9 @@ function roundCoord(value: number): number {
 
 function toWeatherSnapshot(weather: CurrentWeather): WeatherSnapshot {
   return {
-    temperatureF: weather.temperatureF,
-    windSpeedMph: weather.windSpeedMph,
-    precipitationIn: weather.precipitationIn,
+    temperatureC: weather.temperatureC,
+    windSpeedKmh: weather.windSpeedKmh,
+    precipitationMm: weather.precipitationMm,
     weatherCode: weather.weatherCode,
     observedAt: weather.observedAt,
   };

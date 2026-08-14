@@ -1,3 +1,4 @@
+import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
@@ -54,6 +55,7 @@ export default function CaptureScreen() {
 
   return (
     <Screen style={styles.screen}>
+      <Stack.Screen options={{ title: 'Document storm', headerBackTitle: 'Back' }} />
       <ThemedText type="subtitle">Document storm</ThemedText>
 
       {isPreparing ? (

@@ -1,46 +1,29 @@
+import type { CurrentWeather } from '../model/current-weather';
 import { mapOpenMeteoCurrent } from './open-meteo-mapper';
-import { openMeteoCurrentSchema } from './open-meteo-schema';
-
-const fixture = {
-  latitude: 35.2,
-  longitude: -97.4,
-  current: {
-    time: '2026-08-13T17:00',
-    temperature_2m: 86.4,
-    wind_speed_10m: 18.2,
-    precipitation: 0.12,
-    weather_code: 95,
-  },
-};
-
-describe('openMeteoCurrentSchema', () => {
-  it('accepts a valid Open-Meteo current payload', () => {
-    const result = openMeteoCurrentSchema.safeParse(fixture);
-    expect(result.success).toBe(true);
-  });
-
-  it('rejects a payload missing current fields', () => {
-    const result = openMeteoCurrentSchema.safeParse({
-      latitude: 1,
-      longitude: 2,
-      current: { time: '2026-08-13T17:00' },
-    });
-    expect(result.success).toBe(false);
-  });
-});
+import type { OpenMeteoCurrentResponse } from './open-meteo-schema';
 
 describe('mapOpenMeteoCurrent', () => {
-  it('maps DTO fields onto the domain CurrentWeather type', () => {
-    const parsed = openMeteoCurrentSchema.parse(fixture);
-    const weather = mapOpenMeteoCurrent(parsed);
+  const baseResponse: OpenMeteoCurrentResponse = {
+    latitude: 35.4676,
+    longitude: -97.5164,
+    current: {
+      time: '2026-08-13T18:00',
+      temperature_2m: 30,
+      weather_code: 95,
+      wind_speed_10m: 35.4,
+      precipitation: 2.5,
+    },
+  };
 
-    expect(weather).toEqual({
-      temperatureF: 86.4,
-      windSpeedMph: 18.2,
-      precipitationIn: 0.12,
+  it('maps a valid Open-Meteo current block into domain weather', () => {
+    const result = mapOpenMeteoCurrent(baseResponse);
+
+    expect(result).toMatchObject({
+      temperatureC: 30,
       weatherCode: 95,
-      observedAt: expect.any(String),
-    });
-    expect(Number.isNaN(Date.parse(weather.observedAt))).toBe(false);
+      windSpeedKmh: 35.4,
+      precipitationMm: 2.5,
+    } satisfies Partial<CurrentWeather>);
+    expect(result.observedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });

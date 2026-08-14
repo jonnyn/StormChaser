@@ -9,6 +9,7 @@ import { DATABASE_NAME } from '@/db/client';
 import { migrateDatabase } from '@/db/migrations';
 import { useTheme } from '@/hooks/use-theme';
 import { createQueryClient } from '@/shared/lib/query-client';
+import { UnitsProvider } from '@/shared/units/units-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,20 +38,30 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Suspense fallback={<DatabaseFallback />}>
-          <SQLiteProvider databaseName={DATABASE_NAME} onInit={migrateDatabase} useSuspense>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="capture"
-                options={{
-                  presentation: 'modal',
-                  title: 'Document storm',
-                }}
-              />
-            </Stack>
-          </SQLiteProvider>
-        </Suspense>
+        <UnitsProvider>
+          <Suspense fallback={<DatabaseFallback />}>
+            <SQLiteProvider databaseName={DATABASE_NAME} onInit={migrateDatabase} useSuspense>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Back' }} />
+                <Stack.Screen
+                  name="capture"
+                  options={{
+                    presentation: 'modal',
+                    title: 'Document storm',
+                    headerBackTitle: 'Back',
+                  }}
+                />
+                <Stack.Screen
+                  name="observation/[id]"
+                  options={{
+                    title: 'Observation',
+                    headerBackTitle: 'Field Log',
+                  }}
+                />
+              </Stack>
+            </SQLiteProvider>
+          </Suspense>
+        </UnitsProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

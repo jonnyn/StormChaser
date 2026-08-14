@@ -1,53 +1,24 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { useObservations } from '@/features/storms/hooks/use-observations';
+import { ObservationList } from '@/features/storms/ui/observation-list';
 import { Screen } from '@/shared/ui/screen';
 
 export default function FieldLogScreen() {
   const router = useRouter();
-  const theme = useTheme();
+  const { observations, isLoading, errorMessage } = useObservations();
 
   return (
-    <Screen>
+    <Screen style={{ flex: 1 }}>
       <ThemedText type="subtitle">Field Log</ThemedText>
-      <ThemedText themeColor="textSecondary" style={styles.lede}>
-        Documented storms will be listed here in the next milestone.
-      </ThemedText>
-      <ThemedText type="small" themeColor="textSecondary">
-        Capture a photo with weather and location metadata now. The list view lands in Milestone 4.
-      </ThemedText>
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Document a storm"
-        onPress={() => router.push('/capture')}
-        style={({ pressed }) => [
-          styles.button,
-          { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <ThemedText style={styles.buttonLabel}>Document storm</ThemedText>
-      </Pressable>
+      <ObservationList
+        observations={observations}
+        isLoading={isLoading}
+        errorMessage={errorMessage}
+        onPressItem={(id) => router.push(`/observation/${id}`)}
+        onDocumentStorm={() => router.push('/capture')}
+      />
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  lede: {
-    marginBottom: Spacing.one,
-  },
-  button: {
-    marginTop: Spacing.two,
-    alignSelf: 'flex-start',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.two,
-  },
-  buttonLabel: {
-    color: '#ffffff',
-    fontWeight: '600',
-  },
-});

@@ -1,11 +1,12 @@
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { GeoPoint } from '@/services/location/types';
 import { formatDateTime } from '@/shared/lib/dates';
+import { formatPrecipitation, formatTemperature, formatWindSpeed } from '@/shared/lib/units';
+import { useUnits } from '@/shared/units/units-context';
 
 import type { CurrentWeather } from '../model/current-weather';
 import { weatherCodeLabel } from '../model/weather-code-label';
@@ -21,18 +22,45 @@ function formatCoordinate(value: number): string {
 
 export function WeatherSummary({ weather, location }: WeatherSummaryProps) {
   const theme = useTheme();
+  const { units, toggleUnits } = useUnits();
+
+  const temperature = formatTemperature(weather.temperatureC, units);
+  const wind = formatWindSpeed(weather.windSpeedKmh, units);
+  const precipitation = formatPrecipitation(weather.precipitationMm, units);
 
   return (
     <View style={styles.stack}>
-      <ThemedText type="small" themeColor="textSecondary">
-        {weatherCodeLabel(weather.weatherCode)}
-      </ThemedText>
+      <View style={styles.headerRow}>
+        <ThemedText type="small" themeColor="textSecondary">
+          {weatherCodeLabel(weather.weatherCode)}
+        </ThemedText>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            units === 'metric' ? 'Switch to imperial units' : 'Switch to metric units'
+          }
+          onPress={toggleUnits}
+          style={({ pressed }) => [
+            styles.unitsToggle,
+            {
+              borderColor: theme.backgroundSelected,
+              opacity: pressed ? 0.85 : 1,
+            },
+          ]}
+        >
+          <ThemedText type="small">{units === 'metric' ? '°C · km/h' : '°F · mph'}</ThemedText>
+        </Pressable>
+      </View>
 
-      <ThemedView type="backgroundElement" style={styles.card}>
-        <Metric label="Temperature" value={`${Math.round(weather.temperatureF)}°F`} />
-        <Metric label="Wind" value={`${Math.round(weather.windSpeedMph)} mph`} />
-        <Metric label="Precipitation" value={`${weather.precipitationIn.toFixed(2)} in`} />
-      </ThemedView>
+      <View
+        accessibilityRole="summary"
+        accessibilityLabel={`Temperature ${temperature}, wind ${wind}, precipitation ${precipitation}`}
+        style={[styles.card, { backgroundColor: theme.backgroundElement }]}
+      >
+        <Metric label="Temperature" value={temperature} />
+        <Metric label="Wind" value={wind} />
+        <Metric label="Precipitation" value={precipitation} />
+      </View>
 
       <ThemedText type="small" themeColor="textSecondary">
         Observed {formatDateTime(weather.observedAt)}
@@ -49,7 +77,7 @@ export function WeatherSummary({ weather, location }: WeatherSummaryProps) {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <View style={styles.metric}>
+    <View accessibilityLabel={`${label} ${value}`} accessible style={styles.metric}>
       <ThemedText type="small" themeColor="textSecondary">
         {label}
       </ThemedText>
@@ -72,6 +100,18 @@ export function WeatherLoading() {
 const styles = StyleSheet.create({
   stack: {
     gap: Spacing.three,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  unitsToggle: {
+    borderWidth: 1,
+    borderRadius: Spacing.two,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.one,
   },
   card: {
     borderRadius: Spacing.three,

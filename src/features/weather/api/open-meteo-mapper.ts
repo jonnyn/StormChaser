@@ -19,9 +19,9 @@ export function mapOpenMeteoCurrent(response: OpenMeteoCurrentResponse): Current
   const { current } = response;
 
   return {
-    temperatureF: current.temperature_2m,
-    windSpeedMph: current.wind_speed_10m,
-    precipitationIn: current.precipitation,
+    temperatureC: current.temperature_2m,
+    windSpeedKmh: current.wind_speed_10m,
+    precipitationMm: current.precipitation,
     weatherCode: current.weather_code,
     observedAt: toIsoObservedAt(current.time),
   };

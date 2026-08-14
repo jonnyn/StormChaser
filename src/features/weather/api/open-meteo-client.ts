@@ -12,9 +12,9 @@ function buildCurrentUrl(latitude: number, longitude: number): string {
     latitude: String(latitude),
     longitude: String(longitude),
     current: 'temperature_2m,wind_speed_10m,precipitation,weather_code',
-    temperature_unit: 'fahrenheit',
-    wind_speed_unit: 'mph',
-    precipitation_unit: 'inch',
+    temperature_unit: 'celsius',
+    wind_speed_unit: 'kmh',
+    precipitation_unit: 'mm',
     timezone: 'auto',
   });
 

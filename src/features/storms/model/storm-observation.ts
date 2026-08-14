@@ -3,9 +3,9 @@ import type { GeoPoint } from '@/services/location/types';
 import type { StormType } from './storm-type';
 
 export type WeatherSnapshot = {
-  temperatureF: number;
-  windSpeedMph: number;
-  precipitationIn: number;
+  temperatureC: number;
+  windSpeedKmh: number;
+  precipitationMm: number;
   weatherCode: number;
   observedAt: string;
 };

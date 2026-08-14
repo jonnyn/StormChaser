@@ -17,9 +17,9 @@ export type StormObservationRow = {
   latitude: number;
   longitude: number;
   accuracy_meters: number | null;
-  temperature_f: number | null;
-  wind_speed_mph: number | null;
-  precipitation_in: number | null;
+  temperature_c: number | null;
+  wind_speed_kmh: number | null;
+  precipitation_mm: number | null;
   weather_code: number | null;
   weather_observed_at: string | null;
 };
@@ -30,16 +30,16 @@ export function mapStormObservationRow(row: StormObservationRow): StormObservati
   }
 
   const weather =
-    row.temperature_f == null ||
-    row.wind_speed_mph == null ||
-    row.precipitation_in == null ||
+    row.temperature_c == null ||
+    row.wind_speed_kmh == null ||
+    row.precipitation_mm == null ||
     row.weather_code == null ||
     row.weather_observed_at == null
       ? null
       : {
-          temperatureF: row.temperature_f,
-          windSpeedMph: row.wind_speed_mph,
-          precipitationIn: row.precipitation_in,
+          temperatureC: row.temperature_c,
+          windSpeedKmh: row.wind_speed_kmh,
+          precipitationMm: row.precipitation_mm,
           weatherCode: row.weather_code,
           observedAt: row.weather_observed_at,
         };
@@ -86,7 +86,7 @@ export function createSqliteStormRepository(db: SQLiteDatabase): StormRepository
         `INSERT INTO storm_observations (
           id, created_at, captured_at, photo_relative_path, notes, storm_type,
           latitude, longitude, accuracy_meters,
-          temperature_f, wind_speed_mph, precipitation_in, weather_code, weather_observed_at
+          temperature_c, wind_speed_kmh, precipitation_mm, weather_code, weather_observed_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         observation.id,
         observation.createdAt,
@@ -97,9 +97,9 @@ export function createSqliteStormRepository(db: SQLiteDatabase): StormRepository
         observation.location.latitude,
         observation.location.longitude,
         observation.location.accuracyMeters,
-        observation.weather?.temperatureF ?? null,
-        observation.weather?.windSpeedMph ?? null,
-        observation.weather?.precipitationIn ?? null,
+        observation.weather?.temperatureC ?? null,
+        observation.weather?.windSpeedKmh ?? null,
+        observation.weather?.precipitationMm ?? null,
         observation.weather?.weatherCode ?? null,
         observation.weather?.observedAt ?? null
       );

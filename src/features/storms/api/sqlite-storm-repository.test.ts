@@ -65,9 +65,9 @@ function rowFromInsertParams(values: unknown[]): StormObservationRow {
     latitude: Number(values[6]),
     longitude: Number(values[7]),
     accuracy_meters: (values[8] as number | null) ?? null,
-    temperature_f: (values[9] as number | null) ?? null,
-    wind_speed_mph: (values[10] as number | null) ?? null,
-    precipitation_in: (values[11] as number | null) ?? null,
+    temperature_c: (values[9] as number | null) ?? null,
+    wind_speed_kmh: (values[10] as number | null) ?? null,
+    precipitation_mm: (values[11] as number | null) ?? null,
     weather_code: (values[12] as number | null) ?? null,
     weather_observed_at: (values[13] as string | null) ?? null,
   };
@@ -85,18 +85,18 @@ describe('mapStormObservationRow', () => {
       latitude: 35.2,
       longitude: -97.4,
       accuracy_meters: 12,
-      temperature_f: 86,
-      wind_speed_mph: 22,
-      precipitation_in: 0.1,
+      temperature_c: 30,
+      wind_speed_kmh: 35.4,
+      precipitation_mm: 2.5,
       weather_code: 95,
       weather_observed_at: '2026-08-13T17:45:00.000Z',
     });
 
     expect(observation.stormType).toBe('wall_cloud');
     expect(observation.weather).toEqual({
-      temperatureF: 86,
-      windSpeedMph: 22,
-      precipitationIn: 0.1,
+      temperatureC: 30,
+      windSpeedKmh: 35.4,
+      precipitationMm: 2.5,
       weatherCode: 95,
       observedAt: '2026-08-13T17:45:00.000Z',
     });
@@ -113,9 +113,9 @@ describe('mapStormObservationRow', () => {
       latitude: 35.2,
       longitude: -97.4,
       accuracy_meters: null,
-      temperature_f: null,
-      wind_speed_mph: null,
-      precipitation_in: null,
+      temperature_c: null,
+      wind_speed_kmh: null,
+      precipitation_mm: null,
       weather_code: null,
       weather_observed_at: null,
     });
@@ -137,9 +137,9 @@ describe('createSqliteStormRepository', () => {
       stormType: 'hail',
       location: { latitude: 35.1, longitude: -97.5, accuracyMeters: 8 },
       weather: {
-        temperatureF: 70,
-        windSpeedMph: 40,
-        precipitationIn: 0.5,
+        temperatureC: 21.1,
+        windSpeedKmh: 64.4,
+        precipitationMm: 12.7,
         weatherCode: 96,
         observedAt: '2026-08-13T16:55:00.000Z',
       },
@@ -159,7 +159,7 @@ describe('createSqliteStormRepository', () => {
     const listed = await repository.list();
     expect(listed.map((item) => item.id)).toEqual(['without-weather', 'with-weather']);
     expect(listed[0]?.weather).toBeNull();
-    expect(listed[1]?.weather?.temperatureF).toBe(70);
+    expect(listed[1]?.weather?.temperatureC).toBe(21.1);
 
     await expect(repository.getById(withWeather.id)).resolves.toMatchObject({
       id: 'with-weather',

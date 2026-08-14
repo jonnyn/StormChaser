@@ -14,23 +14,12 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDateTime } from '@/shared/lib/dates';
+import { formatWeatherSummary } from '@/shared/lib/units';
+import { useUnits } from '@/shared/units/units-context';
 
 import type { CaptureDraft } from '../hooks/use-capture-observation';
 import type { CaptureFormValues } from '../model/capture-form-schema';
-import { STORM_TYPES, type StormType } from '../model/storm-type';
-
-const STORM_TYPE_LABELS: Record<StormType, string> = {
-  supercell: 'Supercell',
-  tornado: 'Tornado',
-  wall_cloud: 'Wall cloud',
-  funnel_cloud: 'Funnel cloud',
-  hail: 'Hail',
-  lightning: 'Lightning',
-  flash_flood: 'Flash flood',
-  dust_storm: 'Dust storm',
-  tropical: 'Tropical',
-  other: 'Other',
-};
+import { STORM_TYPE_LABELS, STORM_TYPES, type StormType } from '../model/storm-type';
 
 type CaptureFormProps = {
   draft: CaptureDraft;
@@ -48,12 +37,18 @@ export function CaptureForm({
   onSubmit,
 }: CaptureFormProps) {
   const theme = useTheme();
+  const { units } = useUnits();
   const [stormType, setStormType] = useState<StormType>('other');
   const [notes, setNotes] = useState('');
 
   return (
     <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <Image source={{ uri: draft.photoCacheUri }} style={styles.preview} contentFit="cover" />
+      <Image
+        source={{ uri: draft.photoCacheUri }}
+        style={styles.preview}
+        contentFit="cover"
+        accessibilityLabel="Captured storm photo preview"
+      />
 
       <ThemedView type="backgroundElement" style={styles.card}>
         <ThemedText type="smallBold">Captured details</ThemedText>
@@ -65,8 +60,7 @@ export function CaptureForm({
         </ThemedText>
         {draft.weather ? (
           <ThemedText type="small" themeColor="textSecondary">
-            {Math.round(draft.weather.temperatureF)}°F · {Math.round(draft.weather.windSpeedMph)}{' '}
-            mph · {draft.weather.precipitationIn.toFixed(2)} in
+            {formatWeatherSummary(draft.weather, units)}
           </ThemedText>
         ) : (
           <ThemedText type="small" themeColor="warning">
@@ -84,6 +78,7 @@ export function CaptureForm({
               <Pressable
                 key={type}
                 accessibilityRole="button"
+                accessibilityLabel={`${STORM_TYPE_LABELS[type]} storm type`}
                 accessibilityState={{ selected }}
                 onPress={() => setStormType(type)}
                 style={[
@@ -107,6 +102,7 @@ export function CaptureForm({
         <TextInput
           value={notes}
           onChangeText={setNotes}
+          accessibilityLabel="Observation notes"
           placeholder="Describe what you see"
           placeholderTextColor={theme.textSecondary}
           multiline
@@ -126,6 +122,7 @@ export function CaptureForm({
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel="Retake photo"
           disabled={isSaving}
           onPress={onRetake}
           style={({ pressed }) => [
@@ -138,6 +135,7 @@ export function CaptureForm({
 
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel="Save observation"
           disabled={isSaving}
           onPress={() => onSubmit({ stormType, notes })}
           style={({ pressed }) => [

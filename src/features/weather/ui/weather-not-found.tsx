@@ -21,6 +21,7 @@ export function WeatherNotFound({ message, canRetry, onRetry }: WeatherNotFoundP
       {canRetry ? (
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel="Try again"
           onPress={onRetry}
           style={({ pressed }) => [
             styles.retry,
