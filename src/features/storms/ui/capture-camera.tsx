@@ -73,7 +73,9 @@ export function CaptureCamera({ onCaptured }: CaptureCameraProps) {
             { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
           ]}
         >
-          <ThemedText style={styles.buttonLabel}>Allow camera</ThemedText>
+          <ThemedText style={[styles.buttonLabel, { color: theme.onAccent }]}>
+            Allow camera
+          </ThemedText>
         </Pressable>
       </ThemedView>
     );
@@ -143,6 +145,7 @@ export function CaptureCamera({ onCaptured }: CaptureCameraProps) {
           style={({ pressed }) => [
             styles.shutter,
             {
+              borderColor: theme.accent,
               opacity: !isReady || isCapturing || !isFocused ? 0.5 : pressed ? 0.85 : 1,
             },
           ]}
@@ -182,7 +185,6 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     backgroundColor: '#ffffff',
     borderWidth: 4,
-    borderColor: '#0B4F6C',
   },
   secondaryControl: {
     width: 64,
@@ -200,7 +202,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
   },
   buttonLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
   centered: {

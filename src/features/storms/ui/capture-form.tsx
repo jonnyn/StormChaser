@@ -88,7 +88,7 @@ export function CaptureForm({
                   },
                 ]}
               >
-                <ThemedText type="small" style={{ color: selected ? '#ffffff' : theme.text }}>
+                <ThemedText type="small" style={{ color: selected ? theme.onAccent : theme.text }}>
                   {STORM_TYPE_LABELS[type]}
                 </ThemedText>
               </Pressable>
@@ -147,9 +147,11 @@ export function CaptureForm({
           ]}
         >
           {isSaving ? (
-            <ActivityIndicator color="#ffffff" />
+            <ActivityIndicator color={theme.onAccent} />
           ) : (
-            <ThemedText style={styles.primaryLabel}>Save observation</ThemedText>
+            <ThemedText style={[styles.primaryLabel, { color: theme.onAccent }]}>
+              Save observation
+            </ThemedText>
           )}
         </Pressable>
       </View>
@@ -213,7 +215,6 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   primaryLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
 });

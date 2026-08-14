@@ -28,7 +28,7 @@ export function WeatherNotFound({ message, canRetry, onRetry }: WeatherNotFoundP
             { backgroundColor: theme.accent, opacity: pressed ? 0.8 : 1 },
           ]}
         >
-          <ThemedText style={styles.retryLabel}>Try again</ThemedText>
+          <ThemedText style={[styles.retryLabel, { color: theme.onAccent }]}>Try again</ThemedText>
         </Pressable>
       ) : null}
     </ThemedView>
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
   },
   retryLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
 });

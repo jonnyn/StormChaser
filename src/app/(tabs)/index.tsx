@@ -63,7 +63,9 @@ export default function ConditionsScreen() {
                   { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
                 ]}
               >
-                <ThemedText style={styles.logButtonLabel}>Log this</ThemedText>
+                <ThemedText style={[styles.logButtonLabel, { color: theme.onAccent }]}>
+                  Log this
+                </ThemedText>
               </Pressable>
             ) : null}
             {hourly && hourly.length > 0 ? <HourlyForecast hours={hourly} /> : null}
@@ -92,7 +94,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
   },
   logButtonLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
 });

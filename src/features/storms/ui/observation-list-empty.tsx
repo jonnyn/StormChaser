@@ -27,7 +27,9 @@ export function ObservationListEmpty({ onDocumentStorm }: ObservationListEmptyPr
           { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
         ]}
       >
-        <ThemedText style={styles.buttonLabel}>Document storm</ThemedText>
+        <ThemedText style={[styles.buttonLabel, { color: theme.onAccent }]}>
+          Document storm
+        </ThemedText>
       </Pressable>
     </ThemedView>
   );
@@ -46,7 +48,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
   },
   buttonLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
 });

@@ -91,7 +91,9 @@ export function ObservationList({
           { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
         ]}
       >
-        <ThemedText style={styles.headerButtonLabel}>Document storm</ThemedText>
+        <ThemedText style={[styles.headerButtonLabel, { color: theme.onAccent }]}>
+          Document storm
+        </ThemedText>
       </Pressable>
 
       <FlatList
@@ -139,7 +141,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
   },
   headerButtonLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
 });

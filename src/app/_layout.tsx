@@ -1,10 +1,12 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import * as SplashScreen from 'expo-splash-screen';
-import { Suspense, useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, useColorScheme, View } from 'react-native';
 
+import { Colors } from '@/constants/theme';
 import { DATABASE_NAME } from '@/db/client';
 import { migrateDatabase } from '@/db/migrations';
 import { useTheme } from '@/hooks/use-theme';
@@ -27,9 +29,29 @@ function DatabaseFallback() {
   );
 }
 
+function navigationTheme(scheme: 'light' | 'dark'): Theme {
+  const palette = Colors[scheme];
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+
+  return {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: palette.accent,
+      background: palette.background,
+      card: palette.background,
+      text: palette.text,
+      border: palette.backgroundSelected,
+      notification: palette.danger,
+    },
+  };
+}
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const scheme = colorScheme === 'dark' ? 'dark' : 'light';
   const [queryClient] = useState(createQueryClient);
+  const navTheme = useMemo(() => navigationTheme(scheme), [scheme]);
 
   useEffect(() => {
     SplashScreen.hideAsync();
@@ -37,7 +59,8 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={navTheme}>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <UnitsProvider>
           <Suspense fallback={<DatabaseFallback />}>
             <SQLiteProvider databaseName={DATABASE_NAME} onInit={migrateDatabase} useSuspense>

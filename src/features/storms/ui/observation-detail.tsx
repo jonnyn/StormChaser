@@ -94,9 +94,11 @@ export function ObservationDetail({
         ]}
       >
         {isDeleting ? (
-          <ActivityIndicator color="#ffffff" />
+          <ActivityIndicator color={theme.onDanger} />
         ) : (
-          <ThemedText style={styles.deleteLabel}>Delete observation</ThemedText>
+          <ThemedText style={[styles.deleteLabel, { color: theme.onDanger }]}>
+            Delete observation
+          </ThemedText>
         )}
       </Pressable>
     </ScrollView>
@@ -129,7 +131,6 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   deleteLabel: {
-    color: '#ffffff',
     fontWeight: '600',
   },
 });
