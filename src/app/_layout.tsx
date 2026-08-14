@@ -78,7 +78,7 @@ export default function RootLayout() {
                   name="observation/[id]"
                   options={{
                     title: 'Observation',
-                    headerBackTitle: 'Field Log',
+                    headerBackTitle: 'Back',
                   }}
                 />
               </Stack>

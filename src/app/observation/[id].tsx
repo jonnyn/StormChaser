@@ -35,7 +35,7 @@ export default function ObservationDetailScreen() {
   if (!id) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Observation', headerBackTitle: 'Field Log' }} />
+        <Stack.Screen options={{ title: 'Observation', headerBackTitle: 'Back' }} />
         <ThemedText themeColor="danger">Missing observation id.</ThemedText>
       </Screen>
     );
@@ -43,7 +43,7 @@ export default function ObservationDetailScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <Stack.Screen options={{ title: 'Observation', headerBackTitle: 'Field Log' }} />
+      <Stack.Screen options={{ title: 'Observation', headerBackTitle: 'Back' }} />
       {isLoading ? (
         <View style={styles.loading}>
           <ActivityIndicator color={theme.accent} />

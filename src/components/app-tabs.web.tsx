@@ -25,6 +25,9 @@ export default function AppTabs() {
           <TabTrigger name="log" href="/log" asChild>
             <TabButton>Field Log</TabButton>
           </TabTrigger>
+          <TabTrigger name="map" href="/map" asChild>
+            <TabButton>Map</TabButton>
+          </TabTrigger>
         </CustomTabList>
       </TabList>
     </Tabs>
