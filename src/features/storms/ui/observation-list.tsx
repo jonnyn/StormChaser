@@ -1,4 +1,12 @@
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -11,7 +19,9 @@ import { ObservationListItem } from './observation-list-item';
 type ObservationListProps = {
   observations: StormObservation[];
   isLoading: boolean;
+  isRefreshing: boolean;
   errorMessage: string | null;
+  onRefresh: () => void;
   onPressItem: (id: string) => void;
   onDocumentStorm: () => void;
 };
@@ -19,11 +29,21 @@ type ObservationListProps = {
 export function ObservationList({
   observations,
   isLoading,
+  isRefreshing,
   errorMessage,
+  onRefresh,
   onPressItem,
   onDocumentStorm,
 }: ObservationListProps) {
   const theme = useTheme();
+  const refreshControl = (
+    <RefreshControl
+      refreshing={isRefreshing}
+      onRefresh={onRefresh}
+      tintColor={theme.accent}
+      colors={[theme.accent]}
+    />
+  );
 
   if (isLoading) {
     return (
@@ -35,11 +55,19 @@ export function ObservationList({
   }
 
   if (errorMessage) {
-    return <ThemedText themeColor="danger">{errorMessage}</ThemedText>;
+    return (
+      <ScrollView contentContainerStyle={styles.flexGrow} refreshControl={refreshControl}>
+        <ThemedText themeColor="danger">{errorMessage}</ThemedText>
+      </ScrollView>
+    );
   }
 
   if (observations.length === 0) {
-    return <ObservationListEmpty onDocumentStorm={onDocumentStorm} />;
+    return (
+      <ScrollView contentContainerStyle={styles.flexGrow} refreshControl={refreshControl}>
+        <ObservationListEmpty onDocumentStorm={onDocumentStorm} />
+      </ScrollView>
+    );
   }
 
   return (
@@ -60,6 +88,7 @@ export function ObservationList({
         data={observations}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        refreshControl={refreshControl}
         renderItem={({ item }) => <ObservationListItem observation={item} onPress={onPressItem} />}
       />
     </View>
@@ -70,6 +99,9 @@ const styles = StyleSheet.create({
   centered: {
     gap: Spacing.three,
     paddingTop: Spacing.two,
+  },
+  flexGrow: {
+    flexGrow: 1,
   },
   listWrap: {
     flex: 1,

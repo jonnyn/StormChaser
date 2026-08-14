@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -12,41 +12,63 @@ import { Screen } from '@/shared/ui/screen';
 export default function ConditionsScreen() {
   const router = useRouter();
   const theme = useTheme();
-  const { weather, location, isLoading, errorMessage, canRetry, refetch } = useCurrentWeather();
+  const { weather, location, isLoading, isFetching, errorMessage, canRetry, refetch } =
+    useCurrentWeather();
   const canLog = !isLoading && !errorMessage && Boolean(weather && location);
+  const isPullRefreshing = isFetching && !isLoading;
 
   return (
     <Screen>
-      <ThemedText type="subtitle">Conditions</ThemedText>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isPullRefreshing}
+            onRefresh={refetch}
+            tintColor={theme.accent}
+            colors={[theme.accent]}
+          />
+        }
+      >
+        <ThemedText type="subtitle">Conditions</ThemedText>
 
-      {isLoading ? <WeatherLoading /> : null}
+        {isLoading ? <WeatherLoading /> : null}
 
-      {!isLoading && errorMessage ? (
-        <WeatherNotFound message={errorMessage} canRetry={canRetry} onRetry={refetch} />
-      ) : null}
+        {!isLoading && errorMessage ? (
+          <WeatherNotFound message={errorMessage} canRetry={canRetry} onRetry={refetch} />
+        ) : null}
 
-      {!isLoading && !errorMessage && weather && location ? (
-        <WeatherSummary weather={weather} location={location} />
-      ) : null}
+        {!isLoading && !errorMessage && weather && location ? (
+          <WeatherSummary weather={weather} location={location} />
+        ) : null}
 
-      {canLog ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Log this weather as a storm observation"
-          onPress={() => router.push('/capture')}
-          style={({ pressed }) => [
-            styles.logButton,
-            { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
-          ]}
-        >
-          <ThemedText style={styles.logButtonLabel}>Log this</ThemedText>
-        </Pressable>
-      ) : null}
+        {canLog ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Log this weather as a storm observation"
+            onPress={() => router.push('/capture')}
+            style={({ pressed }) => [
+              styles.logButton,
+              { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
+            ]}
+          >
+            <ThemedText style={styles.logButtonLabel}>Log this</ThemedText>
+          </Pressable>
+        ) : null}
+      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    gap: Spacing.three,
+    flexGrow: 1,
+  },
   logButton: {
     alignSelf: 'flex-start',
     marginTop: Spacing.one,
