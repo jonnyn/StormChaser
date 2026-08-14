@@ -1,4 +1,5 @@
 import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import type { ReactNode } from 'react';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -17,6 +18,7 @@ type ObservationListProps = {
   onRefresh: () => void;
   onPressItem: (id: string) => void;
   onDocumentStorm: () => void;
+  listFooter?: ReactNode;
 };
 
 export function ObservationList({
@@ -27,6 +29,7 @@ export function ObservationList({
   onRefresh,
   onPressItem,
   onDocumentStorm,
+  listFooter,
 }: ObservationListProps) {
   const theme = useTheme();
   const refreshControl = (
@@ -68,6 +71,7 @@ export function ObservationList({
     return (
       <ScrollView contentContainerStyle={styles.flexGrow} refreshControl={refreshControl}>
         <ThemedText themeColor="danger">{errorMessage}</ThemedText>
+        {listFooter}
       </ScrollView>
     );
   }
@@ -76,6 +80,7 @@ export function ObservationList({
     return (
       <ScrollView contentContainerStyle={styles.flexGrow} refreshControl={refreshControl}>
         <ObservationListEmpty onDocumentStorm={onDocumentStorm} />
+        {listFooter}
       </ScrollView>
     );
   }
@@ -101,6 +106,7 @@ export function ObservationList({
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         refreshControl={refreshControl}
+        ListFooterComponent={listFooter ?? null}
         renderItem={({ item }) => <ObservationListItem observation={item} onPress={onPressItem} />}
       />
     </View>
