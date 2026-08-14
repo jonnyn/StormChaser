@@ -8,6 +8,7 @@
     "scheme": "stormchaser",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.jonnyn.stormchaser",
       "icon": "./assets/expo.icon"
     },
     "android": {
@@ -31,6 +32,21 @@
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Storm Chaser uses your location to show current weather conditions near you."
+        }
+      ],
+      "expo-sqlite",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Storm Chaser uses the camera to photograph storms for your field log.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": false
         }
       ]
     ],

@@ -36,6 +36,14 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# tests
+coverage/
+
+# python / doc generation
+tmp/
+__pycache__/
+.venv/
+
 example
 
 # generated native folders
