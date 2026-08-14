@@ -1,36 +1,27 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Button } from '@/shared/ui/button';
 
 type ObservationListEmptyProps = {
   onDocumentStorm: () => void;
 };
 
 export function ObservationListEmpty({ onDocumentStorm }: ObservationListEmptyProps) {
-  const theme = useTheme();
-
   return (
     <ThemedView type="backgroundElement" style={styles.card}>
       <ThemedText type="smallBold">No storms logged yet</ThemedText>
       <ThemedText themeColor="textSecondary">
         Capture a photo with location and weather metadata to start your field log.
       </ThemedText>
-      <Pressable
-        accessibilityRole="button"
+      <Button
+        label="Document storm"
         accessibilityLabel="Document a storm"
         onPress={onDocumentStorm}
-        style={({ pressed }) => [
-          styles.button,
-          { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <ThemedText style={[styles.buttonLabel, { color: theme.onAccent }]}>
-          Document storm
-        </ThemedText>
-      </Pressable>
+        style={styles.button}
+      />
     </ThemedView>
   );
 }
@@ -43,11 +34,5 @@ const styles = StyleSheet.create({
   },
   button: {
     alignSelf: 'flex-start',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
-  },
-  buttonLabel: {
-    fontWeight: '600',
   },
 });

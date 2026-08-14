@@ -5,6 +5,8 @@ import type { GeoPoint } from '@/services/location/types';
 import { useNetworkStatus } from '@/services/network/use-network-status';
 import { isAppError } from '@/shared/lib/errors';
 
+import { roundCoord } from '@/shared/lib/coordinates';
+
 import { openMeteoWeatherProvider } from '../api/open-meteo-client';
 import type { CurrentWeather } from '../model/current-weather';
 import type { DailyForecastDay } from '../model/daily-forecast';
@@ -13,10 +15,6 @@ import type { HourlyForecastHour } from '../model/hourly-forecast';
 const LOCATION_STALE_MS = 5 * 60 * 1000;
 const WEATHER_STALE_MS = 3 * 60 * 1000;
 const OFFLINE_MESSAGE = "You're offline. Connect to load current conditions.";
-
-function roundCoord(value: number): number {
-  return Math.round(value * 1000) / 1000;
-}
 
 function shouldRetry(failureCount: number, error: unknown): boolean {
   if (isAppError(error) && (error.code === 'permission_denied' || error.code === 'not_found')) {

@@ -6,6 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { resolvePhotoUri } from '@/services/files/photo-store';
 import { formatDateTime } from '@/shared/lib/dates';
+import { formatCoordinatePair } from '@/shared/lib/coordinates';
 
 import type { StormObservation } from '../model/storm-observation';
 import { stormTypeLabel } from '../model/storm-type';
@@ -35,7 +36,7 @@ export function ObservationListItem({ observation, onPress }: ObservationListIte
             {formatDateTime(observation.capturedAt)}
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            {observation.location.latitude.toFixed(3)}, {observation.location.longitude.toFixed(3)}
+            {formatCoordinatePair(observation.location.latitude, observation.location.longitude)}
           </ThemedText>
         </View>
       </ThemedView>

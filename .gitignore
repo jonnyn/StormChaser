@@ -32,6 +32,7 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
@@ -49,3 +50,10 @@ example
 # generated native folders
 /ios
 /android
+
+.agents/
+.cursor/
+.claude/
+AGENTS.md
+CLAUDE.md
+skills-lock.json

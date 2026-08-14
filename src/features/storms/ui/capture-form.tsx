@@ -1,20 +1,15 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View, Pressable } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDateTime } from '@/shared/lib/dates';
+import { formatCoordinatePair } from '@/shared/lib/coordinates';
 import { formatWeatherSummary } from '@/shared/lib/units';
+import { Button } from '@/shared/ui/button';
+import { InfoCard } from '@/shared/ui/info-card';
 import { useUnits } from '@/shared/units/units-context';
 
 import type { CaptureDraft } from '../hooks/use-capture-observation';
@@ -50,13 +45,13 @@ export function CaptureForm({
         accessibilityLabel="Captured storm photo preview"
       />
 
-      <ThemedView type="backgroundElement" style={styles.card}>
+      <InfoCard>
         <ThemedText type="smallBold">Captured details</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {formatDateTime(draft.capturedAt)}
         </ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {draft.location.latitude.toFixed(3)}, {draft.location.longitude.toFixed(3)}
+          {formatCoordinatePair(draft.location.latitude, draft.location.longitude)}
         </ThemedText>
         {draft.weather ? (
           <ThemedText type="small" themeColor="textSecondary">
@@ -67,7 +62,7 @@ export function CaptureForm({
             Weather unavailable at capture — you can still save.
           </ThemedText>
         )}
-      </ThemedView>
+      </InfoCard>
 
       <View style={styles.section}>
         <ThemedText type="smallBold">Storm type</ThemedText>
@@ -120,40 +115,14 @@ export function CaptureForm({
       {errorMessage ? <ThemedText themeColor="danger">{errorMessage}</ThemedText> : null}
 
       <View style={styles.actions}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Retake photo"
+        <Button label="Retake" variant="outline" disabled={isSaving} onPress={onRetake} flex={1} />
+        <Button
+          label="Save observation"
           disabled={isSaving}
-          onPress={onRetake}
-          style={({ pressed }) => [
-            styles.secondaryButton,
-            { borderColor: theme.backgroundSelected, opacity: pressed ? 0.85 : 1 },
-          ]}
-        >
-          <ThemedText>Retake</ThemedText>
-        </Pressable>
-
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Save observation"
-          disabled={isSaving}
+          loading={isSaving}
           onPress={() => onSubmit({ stormType, notes })}
-          style={({ pressed }) => [
-            styles.primaryButton,
-            {
-              backgroundColor: theme.accent,
-              opacity: isSaving ? 0.6 : pressed ? 0.85 : 1,
-            },
-          ]}
-        >
-          {isSaving ? (
-            <ActivityIndicator color={theme.onAccent} />
-          ) : (
-            <ThemedText style={[styles.primaryLabel, { color: theme.onAccent }]}>
-              Save observation
-            </ThemedText>
-          )}
-        </Pressable>
+          flex={2}
+        />
       </View>
     </ScrollView>
   );
@@ -168,11 +137,6 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 3 / 4,
     borderRadius: Spacing.three,
-  },
-  card: {
-    borderRadius: Spacing.three,
-    padding: Spacing.three,
-    gap: Spacing.one,
   },
   section: {
     gap: Spacing.two,
@@ -197,24 +161,5 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     gap: Spacing.two,
-  },
-  secondaryButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.two,
-    borderWidth: 1,
-  },
-  primaryButton: {
-    flex: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.two,
-    minHeight: 48,
-  },
-  primaryLabel: {
-    fontWeight: '600',
   },
 });

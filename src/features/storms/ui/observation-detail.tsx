@@ -1,13 +1,14 @@
 import { Image } from 'expo-image';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 import { resolvePhotoUri } from '@/services/files/photo-store';
 import { formatDateTime } from '@/shared/lib/dates';
+import { formatCoordinatePair } from '@/shared/lib/coordinates';
 import { formatWeatherSummary } from '@/shared/lib/units';
+import { Button } from '@/shared/ui/button';
+import { InfoCard } from '@/shared/ui/info-card';
 import { useUnits } from '@/shared/units/units-context';
 
 import type { StormObservation } from '../model/storm-observation';
@@ -26,7 +27,6 @@ export function ObservationDetail({
   errorMessage,
   onDelete,
 }: ObservationDetailProps) {
-  const theme = useTheme();
   const { units } = useUnits();
 
   return (
@@ -38,22 +38,22 @@ export function ObservationDetail({
         accessibilityLabel="Storm observation photo"
       />
 
-      <ThemedView type="backgroundElement" style={styles.card}>
+      <InfoCard>
         <ThemedText type="smallBold">{stormTypeLabel(observation.stormType)}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {formatDateTime(observation.capturedAt)}
         </ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {observation.location.latitude.toFixed(3)}, {observation.location.longitude.toFixed(3)}
+          {formatCoordinatePair(observation.location.latitude, observation.location.longitude)}
         </ThemedText>
         {observation.location.accuracyMeters != null ? (
           <ThemedText type="small" themeColor="textSecondary">
             Accuracy ±{Math.round(observation.location.accuracyMeters)} m
           </ThemedText>
         ) : null}
-      </ThemedView>
+      </InfoCard>
 
-      <ThemedView type="backgroundElement" style={styles.card}>
+      <InfoCard>
         <ThemedText type="smallBold">Weather at capture</ThemedText>
         {observation.weather ? (
           <View style={styles.weatherBlock}>
@@ -69,38 +69,24 @@ export function ObservationDetail({
             Weather unavailable at capture
           </ThemedText>
         )}
-      </ThemedView>
+      </InfoCard>
 
-      <ThemedView type="backgroundElement" style={styles.card}>
+      <InfoCard>
         <ThemedText type="smallBold">Notes</ThemedText>
         <ThemedText themeColor="textSecondary">
           {observation.notes.trim().length > 0 ? observation.notes : 'No notes'}
         </ThemedText>
-      </ThemedView>
+      </InfoCard>
 
       {errorMessage ? <ThemedText themeColor="danger">{errorMessage}</ThemedText> : null}
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Delete observation"
+      <Button
+        label="Delete observation"
+        variant="danger"
         disabled={isDeleting}
+        loading={isDeleting}
         onPress={onDelete}
-        style={({ pressed }) => [
-          styles.deleteButton,
-          {
-            backgroundColor: theme.danger,
-            opacity: isDeleting ? 0.6 : pressed ? 0.85 : 1,
-          },
-        ]}
-      >
-        {isDeleting ? (
-          <ActivityIndicator color={theme.onDanger} />
-        ) : (
-          <ThemedText style={[styles.deleteLabel, { color: theme.onDanger }]}>
-            Delete observation
-          </ThemedText>
-        )}
-      </Pressable>
+      />
     </ScrollView>
   );
 }
@@ -115,22 +101,7 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 4,
     borderRadius: Spacing.three,
   },
-  card: {
-    borderRadius: Spacing.three,
-    padding: Spacing.three,
-    gap: Spacing.one,
-  },
   weatherBlock: {
     gap: Spacing.half,
-  },
-  deleteButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.three,
-    borderRadius: Spacing.two,
-    minHeight: 48,
-  },
-  deleteLabel: {
-    fontWeight: '600',
   },
 });

@@ -4,32 +4,20 @@ import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 
-import { openMeteoWeatherProvider } from '@/features/weather/api/open-meteo-client';
-import type { CurrentWeather } from '@/features/weather/model/current-weather';
 import type { LocationWeather } from '@/features/weather/model/location-weather';
+import { openMeteoWeatherProvider } from '@/features/weather/api/open-meteo-client';
 import { persistStormPhoto } from '@/services/files/photo-store';
 import { getCurrentCoordinates } from '@/services/location/get-current-coordinates';
 import type { GeoPoint } from '@/services/location/types';
+import { roundCoord } from '@/shared/lib/coordinates';
 import { AppError, isAppError } from '@/shared/lib/errors';
+import { navigateBackOrReplace } from '@/shared/lib/navigation';
 import { parseWithSchema } from '@/shared/lib/parse';
 
 import { createSqliteStormRepository } from '../api/sqlite-storm-repository';
+import { toWeatherSnapshot } from '../lib/weather-snapshot';
 import { captureFormSchema, type CaptureFormValues } from '../model/capture-form-schema';
 import type { WeatherSnapshot } from '../model/storm-observation';
-
-function roundCoord(value: number): number {
-  return Math.round(value * 1000) / 1000;
-}
-
-function toWeatherSnapshot(weather: CurrentWeather): WeatherSnapshot {
-  return {
-    temperatureC: weather.temperatureC,
-    windSpeedKmh: weather.windSpeedKmh,
-    precipitationMm: weather.precipitationMm,
-    weatherCode: weather.weatherCode,
-    observedAt: weather.observedAt,
-  };
-}
 
 export type CaptureDraft = {
   photoCacheUri: string;
@@ -110,11 +98,7 @@ export function useCaptureObservation() {
           photoRelativePath,
         });
 
-        if (router.canGoBack()) {
-          router.back();
-        } else {
-          router.replace('/log');
-        }
+        navigateBackOrReplace(router, '/log');
       } catch (error) {
         const message = isAppError(error)
           ? error.userMessage

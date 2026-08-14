@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 
 import { deleteStormPhoto } from '@/services/files/photo-store';
 import { AppError, isAppError } from '@/shared/lib/errors';
+import { navigateBackOrReplace } from '@/shared/lib/navigation';
 
 import { createSqliteStormRepository } from '../api/sqlite-storm-repository';
 import type { StormObservation } from '../model/storm-observation';
@@ -52,11 +53,7 @@ export function useObservation(id: string) {
       await repository.delete(observation.id);
       await deleteStormPhoto(observation.photoRelativePath);
 
-      if (router.canGoBack()) {
-        router.back();
-      } else {
-        router.replace('/log');
-      }
+      navigateBackOrReplace(router, '/log');
     } catch (error) {
       const message = isAppError(error) ? error.userMessage : 'Unable to delete this observation.';
       setErrorMessage(message);

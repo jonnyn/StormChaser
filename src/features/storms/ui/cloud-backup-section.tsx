@@ -1,10 +1,11 @@
-import { ActivityIndicator, Platform, Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { CloudBackupResult } from '@/services/cloud/types';
+import { Button } from '@/shared/ui/button';
+import { InfoCard } from '@/shared/ui/info-card';
 
 type CloudBackupSectionProps = {
   isConfigured: boolean;
@@ -29,23 +30,23 @@ export function CloudBackupSection({
 
   if (Platform.OS === 'web') {
     return (
-      <ThemedView type="backgroundElement" style={styles.card}>
+      <InfoCard style={styles.card}>
         <ThemedText type="smallBold">Cloud backup</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Cloud backup is available on iOS and Android.
         </ThemedText>
-      </ThemedView>
+      </InfoCard>
     );
   }
 
   if (!isConfigured) {
     return (
-      <ThemedView type="backgroundElement" style={styles.card}>
+      <InfoCard style={styles.card}>
         <ThemedText type="smallBold">Cloud backup</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Cloud backup not configured. Add credentials to .env.local.
         </ThemedText>
-      </ThemedView>
+      </InfoCard>
     );
   }
 
@@ -53,7 +54,7 @@ export function CloudBackupSection({
   const isDisabled = isUploading || isOffline || isEmpty;
 
   return (
-    <ThemedView type="backgroundElement" style={styles.card}>
+    <InfoCard style={styles.card}>
       <ThemedText type="smallBold">Cloud backup</ThemedText>
 
       {isOffline ? (
@@ -63,7 +64,7 @@ export function CloudBackupSection({
       ) : null}
 
       {isUploading ? (
-        <ThemedView
+        <View
           accessibilityRole="progressbar"
           accessibilityLabel={`Backing up ${observationCount} observations`}
           style={styles.progressRow}
@@ -72,26 +73,14 @@ export function CloudBackupSection({
           <ThemedText type="small" themeColor="textSecondary">
             Backing up {observationCount} observation{observationCount === 1 ? '' : 's'}…
           </ThemedText>
-        </ThemedView>
+        </View>
       ) : (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Back up field log to cloud"
-          accessibilityState={{ disabled: isDisabled }}
+        <Button
+          label={isEmpty ? 'No observations to back up' : 'Back up to cloud'}
           disabled={isDisabled}
           onPress={onBackup}
-          style={({ pressed }) => [
-            styles.button,
-            {
-              backgroundColor: theme.accent,
-              opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
-            },
-          ]}
-        >
-          <ThemedText style={[styles.buttonLabel, { color: theme.onAccent }]}>
-            {isEmpty ? 'No observations to back up' : 'Back up to cloud'}
-          </ThemedText>
-        </Pressable>
+          style={styles.button}
+        />
       )}
 
       {lastResult ? (
@@ -102,16 +91,14 @@ export function CloudBackupSection({
       ) : null}
 
       {errorMessage ? <ThemedText themeColor="danger">{errorMessage}</ThemedText> : null}
-    </ThemedView>
+    </InfoCard>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: Spacing.three,
-    padding: Spacing.three,
-    gap: Spacing.two,
     marginTop: Spacing.two,
+    gap: Spacing.two,
   },
   progressRow: {
     flexDirection: 'row',
@@ -120,13 +107,5 @@ const styles = StyleSheet.create({
   },
   button: {
     alignSelf: 'flex-start',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  buttonLabel: {
-    fontWeight: '600',
   },
 });

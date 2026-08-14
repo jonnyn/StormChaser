@@ -1,9 +1,11 @@
-import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import type { ReactNode } from 'react';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { AppRefreshControl } from '@/shared/ui/app-refresh-control';
+import { Button } from '@/shared/ui/button';
 import { Skeleton } from '@/shared/ui/skeleton';
 
 import type { StormObservation } from '../model/storm-observation';
@@ -32,14 +34,7 @@ export function ObservationList({
   listFooter,
 }: ObservationListProps) {
   const theme = useTheme();
-  const refreshControl = (
-    <RefreshControl
-      refreshing={isRefreshing}
-      onRefresh={onRefresh}
-      tintColor={theme.accent}
-      colors={[theme.accent]}
-    />
-  );
+  const refreshControl = <AppRefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />;
 
   if (isLoading) {
     return (
@@ -87,19 +82,7 @@ export function ObservationList({
 
   return (
     <View style={styles.listWrap}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Document a storm"
-        onPress={onDocumentStorm}
-        style={({ pressed }) => [
-          styles.headerButton,
-          { backgroundColor: theme.accent, opacity: pressed ? 0.85 : 1 },
-        ]}
-      >
-        <ThemedText style={[styles.headerButtonLabel, { color: theme.onAccent }]}>
-          Document storm
-        </ThemedText>
-      </Pressable>
+      <Button label="Document storm" onPress={onDocumentStorm} style={styles.headerButton} />
 
       <FlatList
         data={observations}
@@ -142,11 +125,5 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     alignSelf: 'flex-start',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.two,
-  },
-  headerButtonLabel: {
-    fontWeight: '600',
   },
 });

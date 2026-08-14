@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { GeoPoint } from '@/services/location/types';
+import { formatCoordinatePair } from '@/shared/lib/coordinates';
 import { formatDateTime } from '@/shared/lib/dates';
 import { formatPrecipitation, formatTemperature, formatWindSpeed } from '@/shared/lib/units';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -17,10 +18,6 @@ type WeatherSummaryProps = {
   weather: CurrentWeather;
   location: GeoPoint;
 };
-
-function formatCoordinate(value: number): string {
-  return value.toFixed(3);
-}
 
 export function WeatherSummary({ weather, location }: WeatherSummaryProps) {
   const theme = useTheme();
@@ -84,7 +81,7 @@ export function WeatherSummary({ weather, location }: WeatherSummaryProps) {
         Observed {formatDateTime(weather.observedAt)}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
-        {formatCoordinate(location.latitude)}, {formatCoordinate(location.longitude)}
+        {formatCoordinatePair(location.latitude, location.longitude)}
       </ThemedText>
       <ThemedText type="code" style={{ color: theme.textSecondary }}>
         Open-Meteo
