@@ -9,6 +9,7 @@ import { WeatherForecast } from '@/features/weather/ui/weather-forecast';
 import { WeatherNotFound } from '@/features/weather/ui/weather-not-found';
 import { WeatherLoading, WeatherSummary } from '@/features/weather/ui/weather-summary';
 import { useTheme } from '@/hooks/use-theme';
+import { OfflineBanner } from '@/shared/ui/offline-banner';
 import { Screen } from '@/shared/ui/screen';
 
 export default function ConditionsScreen() {
@@ -21,6 +22,8 @@ export default function ConditionsScreen() {
     location,
     isLoading,
     isFetching,
+    isOffline,
+    isShowingCachedWeather,
     errorMessage,
     canRetry,
     refetch,
@@ -43,6 +46,14 @@ export default function ConditionsScreen() {
         }
       >
         <ThemedText type="subtitle">Conditions</ThemedText>
+
+        {isOffline ? <OfflineBanner /> : null}
+
+        {isShowingCachedWeather ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            Last saved conditions
+          </ThemedText>
+        ) : null}
 
         {isLoading ? <WeatherLoading /> : null}
 

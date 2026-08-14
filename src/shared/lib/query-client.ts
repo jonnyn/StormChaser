@@ -2,6 +2,8 @@ import { QueryClient } from '@tanstack/react-query';
 
 import { isAppError } from '@/shared/lib/errors';
 
+import { WEATHER_CACHE_MS } from './persist-query-keys';
+
 function shouldRetry(failureCount: number, error: unknown): boolean {
   if (isAppError(error) && (error.code === 'permission_denied' || error.code === 'not_found')) {
     return false;
@@ -14,6 +16,8 @@ export function createQueryClient(): QueryClient {
     defaultOptions: {
       queries: {
         staleTime: 3 * 60 * 1000,
+        gcTime: WEATHER_CACHE_MS,
+        networkMode: 'offlineFirst',
         retry: shouldRetry,
       },
     },

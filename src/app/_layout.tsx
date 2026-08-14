@@ -1,4 +1,4 @@
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import * as SplashScreen from 'expo-splash-screen';
@@ -11,6 +11,7 @@ import { DATABASE_NAME } from '@/db/client';
 import { migrateDatabase } from '@/db/migrations';
 import { useTheme } from '@/hooks/use-theme';
 import { createQueryClient } from '@/shared/lib/query-client';
+import { queryPersistOptions } from '@/shared/lib/query-persist';
 import { UnitsProvider } from '@/shared/units/units-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -58,7 +59,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions}>
       <ThemeProvider value={navTheme}>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <UnitsProvider>
@@ -86,6 +87,6 @@ export default function RootLayout() {
           </Suspense>
         </UnitsProvider>
       </ThemeProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCurrentCoordinates } from '@/services/location/get-current-coordinates';
 import type { GeoPoint } from '@/services/location/types';
+import { useNetworkStatus } from '@/services/network/use-network-status';
 import { isAppError } from '@/shared/lib/errors';
 
 import { openMeteoWeatherProvider } from '../api/open-meteo-client';
@@ -11,6 +12,7 @@ import type { HourlyForecastHour } from '../model/hourly-forecast';
 
 const LOCATION_STALE_MS = 5 * 60 * 1000;
 const WEATHER_STALE_MS = 3 * 60 * 1000;
+const OFFLINE_MESSAGE = "You're offline. Connect to load current conditions.";
 
 function roundCoord(value: number): number {
   return Math.round(value * 1000) / 1000;
@@ -30,12 +32,16 @@ export type CurrentWeatherState = {
   location: GeoPoint | undefined;
   isLoading: boolean;
   isFetching: boolean;
+  isOffline: boolean;
+  isShowingCachedWeather: boolean;
   errorMessage: string | null;
   canRetry: boolean;
   refetch: () => void;
 };
 
 export function useCurrentWeather(): CurrentWeatherState {
+  const { isOffline } = useNetworkStatus();
+
   const locationQuery = useQuery({
     queryKey: ['location', 'current'],
     queryFn: getCurrentCoordinates,
@@ -58,16 +64,25 @@ export function useCurrentWeather(): CurrentWeatherState {
     retry: shouldRetry,
   });
 
-  const error = locationQuery.error ?? weatherQuery.error;
+  const hasWeatherData = Boolean(weatherQuery.data?.current);
+  const weatherError = hasWeatherData && isOffline ? null : weatherQuery.error;
+  const error = locationQuery.error ?? weatherError;
+
+  const offlineWithoutCache = isOffline && !hasWeatherData && !isLoading && locationQuery.isSuccess;
+
   const errorMessage = error
     ? isAppError(error)
       ? error.userMessage
       : 'Weather data could not be retrieved.'
-    : null;
+    : offlineWithoutCache
+      ? OFFLINE_MESSAGE
+      : null;
 
   const isLoading =
     locationQuery.isLoading ||
     (locationQuery.isSuccess && weatherQuery.isLoading && !weatherQuery.data);
+
+  const isShowingCachedWeather = isOffline && hasWeatherData;
 
   return {
     weather: weatherQuery.data?.current,
@@ -76,8 +91,10 @@ export function useCurrentWeather(): CurrentWeatherState {
     location: locationQuery.data,
     isLoading,
     isFetching: locationQuery.isFetching || weatherQuery.isFetching,
+    isOffline,
+    isShowingCachedWeather,
     errorMessage,
-    canRetry: Boolean(error),
+    canRetry: Boolean(error) && !isOffline,
     refetch: () => {
       if (locationQuery.isError) {
         void locationQuery.refetch();
